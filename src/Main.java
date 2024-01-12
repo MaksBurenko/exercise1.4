@@ -1,10 +1,9 @@
 import java.util.*;
 
+import static java.lang.Long.parseLong;
+
 public class Main {
     public static void main(String[] args) {
-
-        int i = 0;
-        int j = 0;
 
         int n = 0;
         int k = 0;
@@ -14,14 +13,14 @@ public class Main {
         long result = 0;
 
         List <Long> list = new ArrayList<>();
-
         Map<Integer, ArrayList<Long>> map = new TreeMap<>();
 
         try {
 
             //   Scanner scanner = new Scanner(System.in);
-            Scanner scanner = new Scanner("5 2" + "\n" + "1  7  10  5  777 555 525 12");
+            Scanner scanner = new Scanner("1  10" + "\n" + "9999");
 
+            int i = 0;
             while (scanner.hasNextLine() && i<2) {
                 switch (i) {
                     case 0:
@@ -40,6 +39,10 @@ public class Main {
 
             scanner.close();
 
+        } catch (IndexOutOfBoundsException | NoSuchElementException e) {
+            e.printStackTrace(System.out);
+        }
+
             for (long temp : list) {
                 sumOld += temp;
                 map.put(scanNumbers(temp), new ArrayList<>());
@@ -55,17 +58,38 @@ public class Main {
             }
 
             Set<Integer> keys = map.keySet();
-            for (int index = keys.size(); index > 0; index--) {
-                ArrayList<Long> values = map.get(index);
-                for(long value : values){
+            Integer[] arrayKeys = new Integer[keys.size()];
+            arrayKeys = keys.toArray(arrayKeys);
+            Arrays.sort(arrayKeys, Collections.reverseOrder());
 
+            int j=0;
+
+            for (Integer key : arrayKeys) {
+                ArrayList<Long> values = map.get(key);
+                ArrayList<Long> tempList = new ArrayList<>(values);
+
+                for (long value : values) {
+                    if(j < k) {
+                        long newNumber = numberChange(value, key);
+
+                        tempList.remove(value);
+                        tempList.add(newNumber);
+
+                        j++;
+                    }
+                    else{
+                        break;
+                    }
                 }
+                map.put(key, tempList);
             }
+            for(Integer key : keys){
+                long sum = sumValues(map.get(key));
+                sumNew = sumNew + sum;
+            }
+            result = sumNew - sumOld;
 
-
-        } catch (IndexOutOfBoundsException | NoSuchElementException e) {
-            e.printStackTrace(System.out);
-        }
+        System.out.println(result);
     }
 
     public static int scanNumbers (long number){
@@ -74,20 +98,33 @@ public class Main {
 
     public static long numberChange (long value, int key) {
 
-        return 0;
+        long newNumber = 0;
+        StringBuilder stringNumber = new StringBuilder();
+
+        long[] separatedNumbers = new long[key];
+        for (int i = separatedNumbers.length-1; i >= 0; i--) {
+            separatedNumbers[i] = value % 10;
+            value = value / 10;
+        }
+        for (int temp = 0; temp < separatedNumbers.length; temp++){
+            if (separatedNumbers[temp] < 9){
+                separatedNumbers[temp] = 9;
+                break;
+            }
+        }
+        for (long number : separatedNumbers) {
+            stringNumber.append(number);
+        }
+        newNumber = parseLong(stringNumber.toString());
+
+        return newNumber;
+    }
+
+    public static long sumValues(ArrayList<Long> values){
+        long sum = 0;
+        for(long value : values){
+           sum = sum + value;
+        }
+        return sum;
     }
 }
-
-class A{
-    public static void main(String[] args) {
-        int a = 123 / 100;
-        int b = 123 / 10 % 10;
-        int c = 123 % 100;
-        System.out.println(a);
-        System.out.println(b);
-        System.out.println(c);
-    }
-}
-
-
-
